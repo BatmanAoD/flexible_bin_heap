@@ -9,5 +9,5 @@ fn ord_by_cmp() {
     heap.push(2);
     heap.push(9);
     heap.push(0);
-    println!("{:#?}", heap);
+    // println!("{:#?}", heap);     // TODO - resolve `fmt` issue
 }

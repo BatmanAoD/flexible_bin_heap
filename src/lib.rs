@@ -4,7 +4,9 @@ use std::cmp::Ordering;
 use std::iter::FromIterator;
 use std::fmt::Debug;
 
-trait ContainerLike<T: Ord>: Clone + Debug + Default + FromIterator<T> + IntoIterator { }
+// XXX how to get `Debug` here? Need to mark it for `T` everywhere?
+// XXX similar: Clone
+trait ContainerLike<T: Ord>: /* Clone + Debug + */ Default + FromIterator<T> + IntoIterator { }
 
 trait DynCmpContainer<T: Ord, C: ContainerLike<T>>: ContainerLike<T> {
     // XXX associated traits, or trait aliases?
@@ -26,6 +28,8 @@ struct BinaryHeapDynCmp<T: Ord> {
     container: BinaryHeap<T>,
     cmp: Box<dyn Fn(&T, &T) -> Ordering>
 }
+
+impl<T: Ord> ContainerLike<T> for BinaryHeap<T> { }     // XXX - forward everything to `container`
 
 impl<T: Ord> DynCmpContainer<T, BinaryHeap<T>> for BinaryHeapDynCmp<T> {
     fn set_cmp(comparator: impl Fn(&T, &T) -> Ordering) {
