@@ -1,47 +1,60 @@
+// FIRST IMPL: no macro
+/* 
+
 use std::collections::BinaryHeap;
 
 use std::cmp::Ordering;
 use std::iter::FromIterator;
 use std::fmt::Debug;
 
+
 // XXX how to get `Debug` here? Need to mark it for `T` everywhere?
 // XXX similar: Clone
-trait ContainerLike<T: Ord>: /* Clone + Debug + */ Default + FromIterator<T> + IntoIterator { }
-
-trait DynCmpContainer<T: Ord, C: ContainerLike<T>>: ContainerLike<T> {
-    // XXX associated traits, or trait aliases?
-    // trait Comparator: Fn(&T, &T) -> Ordering {}
-
-    fn set_cmp(comparator: impl Fn(&T, &T) -> Ordering);
+trait ContainerLike<T: PartialOrd>: /* Clone + Debug + */ Default + FromIterator<T> + IntoIterator { }
+trait CmpFn<T: PartialOrd> {
+    fn compare(l: &T, r: &T) -> Option(Ordering);
 }
 
-trait WithDynCmp<T: Ord, C: ContainerLike<T>, D: DynCmpContainer<T, C>> {
-    fn with_cmp(comparator: impl Fn(&T, &T) -> Ordering) -> C;
-}
+// #[derive(Debug)]
+struct ItemWrapper<T: PartialOrd, F: CmpFn<T>> (T);
 
-// ---
-
-impl<T: Ord> ContainerLike<T> for BinaryHeap<T> { }
-
-#[derive(Debug)]
-struct BinaryHeapDynCmp<T: Ord> {
-    container: BinaryHeap<T>,
-    cmp: Box<dyn Fn(&T, &T) -> Ordering>
-}
-
-impl<T: Ord> ContainerLike<T> for BinaryHeap<T> { }     // XXX - forward everything to `container`
-
-impl<T: Ord> DynCmpContainer<T, BinaryHeap<T>> for BinaryHeapDynCmp<T> {
-    fn set_cmp(comparator: impl Fn(&T, &T) -> Ordering) {
-        unimplemented!()
+impl<T: PartialOrd, F: CmpFn<T>> PartialOrd for ItemWrapper<T, F> {
+    fn partial_cmp(&self, other: &T) -> Option(Ordering) {
+        F::compare(self, other)
     }
 }
 
-impl<T: Ord> WithDynCmp<T, BinaryHeap<T>, BinaryHeapDynCmp<T>> for BinaryHeap<T> {
-    fn with_cmp(comparator: impl Fn(&T, &T) -> Ordering) -> BinaryHeapDynCmp<T> {
-        BinaryHeapDynCmp::<T> {
-            container: BinaryHeap::new(),
-            cmp: Box::new(comparator)
+trait WithCmp {
+    type NewContainer;
+    // XXX how does `F` get used here?
+    fn with_cmp<F: CmpFn<T>>() -> ???
+}
+
+impl<T: PartialOrd> WithCmp for BinaryHeap<T> {
+    fn with_cmp<F: CmpFn<T>>() -> BinaryHeap<ItemWrapper<T, F>> {
+        BinaryHeap::new()
+    }
+}
+*/
+
+// SECOND IMPL: Macro
+
+extern crate proc_macro;
+use proc_macro::TokenStream;
+use quote::quote;
+use syn::{DeriveInput, Ident, parse_macro_input};
+
+#[proc_macro_attribute]
+pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
+    let decl = parse_macro_input!(newtype as DeriveInput);
+    let comparator = parse_macro_input!(cmp as Ident);
+    let name = decl.ident;
+    let tokens = quote!{
+        impl PartialOrd for #name {
+            fn partial_cmp(&self, other: & #name) -> Option(Ordering) {
+                self.#comparator .partial_cmp(other.#comparator)
+            }
         }
-    }
+    };
+    tokens.into()
 }
