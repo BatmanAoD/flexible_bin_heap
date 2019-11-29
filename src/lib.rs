@@ -42,15 +42,28 @@ impl<T: PartialOrd> WithCmp for BinaryHeap<T> {
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{DeriveInput, Ident, parse_macro_input};
+use syn::{DeriveInput, Ident, Data, Fields, parse_macro_input};
 
 #[proc_macro_attribute]
 pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
     let decl = parse_macro_input!(newtype as DeriveInput);
     let comparator = parse_macro_input!(cmp as Ident);
     let name = &decl.ident;
+    let wrapped = match &decl.data {
+        Data::Struct(s) => match &s.fields {
+            Fields::Unnamed(f) => f.unnamed.first().unwrap(),
+            _ => panic!("not a tuple struct")
+        }
+        _ => panic!("Not a struct")
+    };
     TokenStream::from(quote!{
         #decl
+
+        impl From<#wrapped> for #name {
+            fn from(w: #wrapped) -> #name {
+                #name ( w )
+            }
+        }
 
         impl PartialEq for #name {
             fn eq(&self, other: & #name) -> bool {
