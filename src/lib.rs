@@ -69,7 +69,8 @@ pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
 
         impl Ord for #name {
             fn cmp(&self, other: & #name) -> Ordering {
-                (self.0).#comparator .cmp(&(other.0).#comparator)
+                // To allow floats, just panic  if values are not comparable
+                (self.0).#comparator .partial_cmp(&(other.0).#comparator).unwrap()
             }
         }
     })
