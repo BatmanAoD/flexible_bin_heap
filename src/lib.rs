@@ -50,7 +50,7 @@ pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
     let comparator = parse_macro_input!(cmp as Ident);
     let name = &decl.ident;
     TokenStream::from(quote!{
-        #decl   // XXX why is this necessary? I thought proc_macros only _appended_ code?
+        #decl
 
         impl PartialEq for #name {
             fn eq(&self, other: & #name) -> bool {
