@@ -54,13 +54,22 @@ pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
 
         impl PartialEq for #name {
             fn eq(&self, other: & #name) -> bool {
-                (self.0).#comparator .eq((other.0).#comparator)
+                (self.0).#comparator .eq(&(other.0).#comparator)
             }
         }
 
+        impl Eq for #name { }
+
+        // XXX why can't `PartialOrd` be derived based on `Ord`?
         impl PartialOrd for #name {
             fn partial_cmp(&self, other: & #name) -> Option<Ordering> {
-                (self.0).#comparator .partial_cmp((other.0).#comparator)
+                (self.0).#comparator .partial_cmp(&(other.0).#comparator)
+            }
+        }
+
+        impl Ord for #name {
+            fn cmp(&self, other: & #name) -> Ordering {
+                (self.0).#comparator .cmp(&(other.0).#comparator)
             }
         }
     })
