@@ -24,7 +24,6 @@ struct MyData {
 }
 
 #[with_comparator(data2)]
-#[derive(Debug)]
 struct MyDataByData2(MyData);
 
 #[test]
