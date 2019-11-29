@@ -1,4 +1,4 @@
-use crate::BinaryHeap;
+use std::collections::BinaryHeap;
 
 /*
 #[test]
@@ -14,23 +14,32 @@ fn ord_by_cmp() {
 }
 */
 
+use dynamic_ord::with_comparator;
+use std::cmp::Ordering;
+
+#[derive(Debug)]
 struct MyData {
     data1: i32,
     data2: f64
 }
+#![feature(trace_macros)]
 
-#[derive(Debug)]
+trace_macros!(true);
+
 #[with_comparator(data2)]
+#[derive(Debug)]
 struct MyDataByData2(MyData);
 
 #[test]
 fn order_using_macro() {
-    let heap = BinaryHeap<MyDataByData2>();
+    let heap = BinaryHeap::<MyDataByData2>::new();
+    /* XXX - need to transform each `MyData` into `MyDataByData2`
     heap.push(MyData { data1: 5, data2: 3.2 });
     heap.push(MyData { data1: 8, data2: 0.7 });
-    heap.push(MyData { data1: 1, data2: 345 });
-    heap.push(MyData { data1: 2, data2: 11 });
+    heap.push(MyData { data1: 1, data2: 345.2 });
+    heap.push(MyData { data1: 2, data2: 11.1 });
     heap.push(MyData { data1: 9, data2: -34.3 });
     heap.push(MyData { data1: 0, data2: -4.0 });
+    */
     println!("{:#?}", heap);
 }

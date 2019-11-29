@@ -49,12 +49,13 @@ pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
     let decl = parse_macro_input!(newtype as DeriveInput);
     let comparator = parse_macro_input!(cmp as Ident);
     let name = decl.ident;
-    let tokens = quote!{
+    TokenStream::from(quote!{
+        #newtype
+
         impl PartialOrd for #name {
             fn partial_cmp(&self, other: & #name) -> Option(Ordering) {
                 self.#comparator .partial_cmp(other.#comparator)
             }
         }
-    };
-    tokens.into()
+    })
 }
