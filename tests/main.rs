@@ -29,14 +29,12 @@ struct MyDataByData2(MyData);
 
 #[test]
 fn order_using_macro() {
-    let heap = BinaryHeap::<MyDataByData2>::new();
-    /* XXX - need to transform each `MyData` into `MyDataByData2`
-    heap.push(MyData { data1: 5, data2: 3.2 });
-    heap.push(MyData { data1: 8, data2: 0.7 });
-    heap.push(MyData { data1: 1, data2: 345.2 });
-    heap.push(MyData { data1: 2, data2: 11.1 });
-    heap.push(MyData { data1: 9, data2: -34.3 });
-    heap.push(MyData { data1: 0, data2: -4.0 });
-    */
+    let mut heap = BinaryHeap::<MyDataByData2>::new();
+    heap.push(MyData { data1: 5, data2: 3.2 }.into());
+    heap.push(MyData { data1: 8, data2: 0.7 }.into());
+    heap.push(MyData { data1: 1, data2: 345.2 }.into());
+    heap.push(MyData { data1: 2, data2: 11.1 }.into());
+    heap.push(MyData { data1: 9, data2: -34.3 }.into());
+    heap.push(MyData { data1: 0, data2: -4.0 }.into());
     println!("{:#?}", heap);
 }
