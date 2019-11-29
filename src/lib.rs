@@ -52,9 +52,15 @@ pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
     TokenStream::from(quote!{
         #decl   // XXX why is this necessary? I thought proc_macros only _appended_ code?
 
+        impl PartialEq for #name {
+            fn eq(&self, other: & #name) -> bool {
+                (self.0).#comparator .eq((other.0).#comparator)
+            }
+        }
+
         impl PartialOrd for #name {
-            fn partial_cmp(&self, other: & #name) -> Option(Ordering) {
-                self.#comparator .partial_cmp(other.#comparator)
+            fn partial_cmp(&self, other: & #name) -> Option<Ordering> {
+                (self.0).#comparator .partial_cmp((other.0).#comparator)
             }
         }
     })
