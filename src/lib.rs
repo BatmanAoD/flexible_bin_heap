@@ -48,9 +48,9 @@ use syn::{DeriveInput, Ident, parse_macro_input};
 pub fn with_comparator(cmp: TokenStream, newtype: TokenStream) -> TokenStream {
     let decl = parse_macro_input!(newtype as DeriveInput);
     let comparator = parse_macro_input!(cmp as Ident);
-    let name = decl.ident;
+    let name = &decl.ident;
     TokenStream::from(quote!{
-        #newtype
+        #decl   // XXX why is this necessary? I thought proc_macros only _appended_ code?
 
         impl PartialOrd for #name {
             fn partial_cmp(&self, other: & #name) -> Option(Ordering) {
