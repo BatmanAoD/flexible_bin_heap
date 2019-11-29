@@ -22,9 +22,6 @@ struct MyData {
     data1: i32,
     data2: f64
 }
-#![feature(trace_macros)]
-
-trace_macros!(true);
 
 #[with_comparator(data2)]
 #[derive(Debug)]
