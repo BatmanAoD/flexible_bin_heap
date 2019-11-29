@@ -14,7 +14,7 @@ fn ord_by_cmp() {
 }
 */
 
-use dynamic_ord::with_comparator;
+use flexible_bin_heap::with_comparator;
 use std::cmp::Ordering;
 
 #[derive(Debug)]
